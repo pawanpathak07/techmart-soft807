@@ -31,9 +31,18 @@ app.use(
     },
   })
 );
+
 app.use(express.json({ limit: '100kb' }));
 app.use(cookieParser());
 app.use(loadUser);
+
+
+app.get('/api/health', (req, res) => {
+  res.json({
+    status: 'ok',
+    instance: process.env.RENDER_INSTANCE_ID || process.env.HOSTNAME || 'local'
+  });
+});
 
 // ----- API -----
 app.use('/api/auth', require('./src/routes/auth'));
