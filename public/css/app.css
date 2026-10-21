@@ -417,25 +417,18 @@ td.actions .btn {
 
 .product .img {
   width: 100%;
-  height: 290px;
-  padding: 10px;
-  margin: 0;
+  height: 220px;
   overflow: hidden;
-  display: block;
-  background: var(--brand-soft);
-  box-sizing: border-box;
+  background: #f5f5f5;
 }
 
 .product .img img {
   display: block;
-  width: 100% !important;
-  height: 100% !important;
-  max-width: none !important;
-  max-height: none !important;
-  padding: 0 !important;
-  margin: 0 !important;
-  object-fit: cover !important;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
   object-position: center;
+  padding: 8px;
   box-sizing: border-box;
 }
 
