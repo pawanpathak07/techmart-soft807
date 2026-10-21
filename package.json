@@ -1,0 +1,30 @@
+{
+  "name": "shopapp",
+  "version": "1.0.0",
+  "description": "Full-stack CRUD shop with customer site, admin panel, Express API and SQLite database",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "seed": "node src/seed.js",
+    "migrate:mysql": "node scripts/migrate-sqlite-to-mysql.js"
+  },
+  "engines": {
+    "node": ">=22.13"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cookie-parser": "^1.4.7",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.4.1",
+    "helmet": "^8.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "mysql2": "^3.14.1",
+    "nodemailer": "^6.10.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.7"
+  },
+  "license": "MIT"
+}

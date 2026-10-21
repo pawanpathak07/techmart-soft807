@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TechMart - My orders</title>
+  <link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+  <main class="container">
+    <div id="alert" class="alert"></div>
+    <div class="two" style="grid-template-columns:2fr 1fr;align-items:start">
+      <section>
+        <div class="page-head"><div><h1>My orders</h1><p class="muted" style="margin:0">Track what you have bought.</p></div></div>
+        <div id="orders"></div>
+      </section>
+      <aside class="card">
+        <h2>My account</h2>
+        <div id="accAlert" class="alert"></div>
+        <form id="accForm" novalidate>
+          <div class="field"><label>Email</label><input id="accEmail" disabled></div>
+          <div class="field"><label for="accName">Name</label><input id="accName" required></div>
+          <div class="field"><label for="curPw">Current password</label><input id="curPw" type="password" autocomplete="current-password"></div>
+          <div class="field"><label for="newPw">New password (optional)</label><input id="newPw" type="password" autocomplete="new-password"></div>
+          <button class="btn primary" type="submit">Save changes</button>
+        </form>
+      </aside>
+    </div>
+  </main>
+  <script src="/js/common.js"></script>
+  <script src="/js/orders.js"></script>
+</body>
+</html>

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Admin - Customers</title>
+  <link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+  <main class="container">
+    <div class="page-head">
+      <div><h1>Customers &amp; users</h1><p class="muted" style="margin:0">Manage accounts, roles and access.</p></div>
+      <button class="btn primary" id="addBtn">+ Add user</button>
+    </div>
+    <div class="toolbar"><input id="search" type="search" placeholder="Search by name or email..."></div>
+    <div class="card table-wrap" id="table"></div>
+  </main>
+
+  <dialog id="dlg">
+    <form id="form" novalidate>
+      <h2 id="dlgTitle">Add user</h2>
+      <div id="formAlert" class="alert"></div>
+      <div class="field"><label for="name">Full name</label><input id="name" required maxlength="80"></div>
+      <div class="field"><label for="email">Email</label><input id="email" type="email" required></div>
+      <div class="field"><label for="password" id="pwLabel">Password (8+ characters)</label><input id="password" type="password" autocomplete="new-password"></div>
+      <div class="row">
+        <div class="field"><label for="role">Role</label>
+          <select id="role"><option value="customer">Customer</option><option value="admin">Admin</option></select></div>
+        <div class="field check" style="padding-top:24px"><input id="active" type="checkbox" checked><label for="active">Account active</label></div>
+      </div>
+      <div class="dlg-actions">
+        <button type="button" class="btn" id="cancelBtn">Cancel</button>
+        <button type="submit" class="btn primary">Save</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="/js/common.js"></script>
+  <script src="/js/admin-customers.js"></script>
+</body>
+</html>

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TechMart - Shop</title>
+  <link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+  <main class="container">
+    <section class="hero">
+      <h1>Gear up for work and play</h1>
+      <p>Browse the catalogue, add items to your cart and check out in a few clicks.</p>
+    </section>
+
+    <div class="toolbar">
+      <input id="search" type="search" placeholder="Search products...">
+      <select id="category"><option value="">All categories</option></select>
+    </div>
+
+    <div id="grid" class="grid"></div>
+  </main>
+  <dialog id="reviewsDlg"><div class="dlg"><h2 id="reviewsTitle">Product reviews</h2><div id="reviewsContent"></div><div class="dlg-actions"><button class="btn" id="closeReviews">Close</button></div></div></dialog>
+  <script src="/js/common.js"></script>
+  <script src="/js/shop.js"></script>
+</body>
+</html>

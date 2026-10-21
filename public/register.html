@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TechMart - Sign up</title>
+  <link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+  <main class="auth-wrap">
+    <div class="card">
+      <h1>Create your account</h1>
+      <p class="muted">Create your account using a Gmail address.</p>
+      <div id="alert" class="alert"></div>
+      <form id="form" novalidate>
+        <div class="field"><label for="name">Full name</label><input id="name" autocomplete="name" required></div>
+        <div class="field"><label for="email">Gmail address</label><input id="email" type="email" autocomplete="username" placeholder="you@gmail.com" pattern="^[a-zA-Z0-9][a-zA-Z0-9._+-]*@gmail\.com$" title="Please use a Gmail address ending in @gmail.com" required><small class="muted">Only @gmail.com addresses are accepted.</small></div>
+        <div class="field"><label for="password">Password (at least 8 characters)</label><input id="password" type="password" autocomplete="new-password" minlength="8" maxlength="128" pattern="(?=.*[@#$%]).{8,}" title="Use at least 8 characters and include one of these symbols: @ # $ %" required><small class="muted">Use 8 or more characters and include at least one @, #, $ or % symbol. Longer passwords are recommended.</small></div>
+        <div class="field"><label for="confirm">Confirm password</label><input id="confirm" type="password" autocomplete="new-password" minlength="8" maxlength="128" required></div>
+        <button class="btn primary" style="width:100%" type="submit">Sign up</button>
+      </form>
+      <p class="small" style="text-align:center;margin-bottom:0">Already registered? <a href="/login.html">Log in</a></p>
+    </div>
+  </main>
+  <script src="/js/common.js"></script>
+  <script src="/js/register.js"></script>
+</body>
+</html>
