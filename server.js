@@ -57,8 +57,12 @@ app.use((err, _req, res, _next) => {
   res.status(500).json({ error: 'Something went wrong on the server' });
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Shop running at http://localhost:${PORT}`);
-  console.log(`Admin panel:     http://localhost:${PORT}/admin/`);
-});
+if (require.main === module) {
+  const PORT = process.env.PORT || 3000;
+  app.listen(PORT, () => {
+    console.log(`Shop running at http://localhost:${PORT}`);
+    console.log(`Admin panel:     http://localhost:${PORT}/admin/`);
+  });
+}
+
+module.exports = app;
