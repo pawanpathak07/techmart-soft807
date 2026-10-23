@@ -10,11 +10,11 @@ function seed() {
       'INSERT INTO users (name, email, password_hash, role) VALUES (?, ?, ?, ?)'
     );
     // insert.run('Admin User', 'admin@shop.local', bcrypt.hashSync('Admin@123', 10), 'admin');
-    // insert.run('Demo Customer', 'demo@shop.local', bcrypt.hashSync('Customer@123', 10), 'customer');
-    // console.log('Seeded users: admin@shop.local / Admin@123 and demo@shop.local / Customer@123');
+    // insert.run('Demo Customer', 'demo@gmail.com', bcrypt.hashSync('Customer@123', 10), 'customer');
+    // console.log('Seeded users: admin@shop.local / Admin@123 and demo@gmail.com / Customer@123');
     insert.run('Admin User', 'admin@gmail.com', bcrypt.hashSync('Admin@123', 10), 'admin');
     insert.run('Demo Customer', 'demo@gmail.com', bcrypt.hashSync('Customer@123', 10), 'customer');
-    console.log('Seeded users: admin@gmail.com / Admin@123 and demo@shop.local / Customer@123');
+    console.log('Seeded users: admin@gmail.com / Admin@123 and demo@gmail.com / Customer@123');
   }
 
   const { p } = db.prepare('SELECT COUNT(*) AS p FROM products').get();
@@ -36,11 +36,50 @@ function seed() {
       ['LED Desk Lamp', 'Dimmable desk lamp with 5 colour temperatures.', 'Smart Home', 39.0, 18],
       ['Gaming Chair', 'Reclining ergonomic chair with lumbar support.', 'Furniture', 219.0, 0],
     ];
-    const tx = db.transaction(() => demo.forEach((d) => insert.run(...d, '')));
+    
+    const images = {
+  'Wireless Mouse': '/images/products/mouse.jpeg',
+  'Mechanical Keyboard': '/images/products/keyboard.jpeg',
+  '27" 4K Monitor': '/images/products/monitor.webp',
+  'USB-C Hub 7-in-1': '/images/products/usb-hub.jpg',
+  'Noise-Cancelling Headphones': '/images/products/headphones.webp',
+  'Portable Speaker': '/images/products/speaker.webp',
+  'Webcam 1080p': '/images/products/webcam.jpeg',
+  'Laptop Stand': '/images/products/laptop-stand.jpg',
+  'External SSD 1TB': '/images/products/ssd.webp',
+  'Smart Plug (2 pack)': '/images/products/smart-plug.jpg',
+  'LED Desk Lamp': '/images/products/desk-lamp.jpg',
+  'Gaming Chair': '/images/products/gaming-chair.jpg'
+};
+
+const tx = db.transaction(() => demo.forEach((d) => {
+  insert.run(...d, images[d[0]] || '');
+}));
     tx();
     console.log(`Seeded ${demo.length} products`);
   }
 }
 
+// Makes sure every product picture path points to a file that really exists in public/images/products.
+// If a path ends with a different extension (for example mouse.png but the file is mouse.jpeg), it is corrected.
+function fixLocalImages() {
+  const fs = require('fs');
+  const path = require('path');
+  const dir = path.join(__dirname, '..', 'public', 'images', 'products');
+  let files;
+  try { files = fs.readdirSync(dir); } catch (e) { return; }
+  const byBase = {};
+  files.forEach((f) => { const b = f.replace(/\.[^.]+$/, '').toLowerCase(); if (!byBase[b]) byBase[b] = f; });
+  const update = db.prepare('UPDATE products SET image_url = ? WHERE id = ?');
+  const rows = db.prepare("SELECT id, image_url FROM products WHERE image_url LIKE '/images/products/%'").all();
+  for (const r of rows) {
+    const rel = r.image_url.replace('/images/products/', '');
+    if (files.includes(rel)) continue;
+    const base = rel.replace(/\.[^.]+$/, '').toLowerCase();
+    if (byBase[base]) update.run('/images/products/' + byBase[base], r.id);
+  }
+}
+
 seed();
+fixLocalImages();
 module.exports = seed;

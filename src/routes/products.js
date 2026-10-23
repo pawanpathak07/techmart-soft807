@@ -7,8 +7,8 @@ const router = express.Router();
 
 function readBody(b) {
   const imageUrl = v.str(b.image_url, { field: 'Image URL', max: 500 });
-  if (imageUrl && !/^https?:\/\//i.test(imageUrl))
-    throw new v.HttpError(400, 'Image URL must start with http:// or https://');
+  if (imageUrl && !/^(https?:\/\/|\/images\/)/i.test(imageUrl))
+    throw new v.HttpError(400, 'Image URL must start with http://, https:// or /images/');
   return {
     name: v.str(b.name, { field: 'Name', required: true, max: 120 }),
     description: v.str(b.description, { field: 'Description', max: 2000 }),
