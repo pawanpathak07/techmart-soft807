@@ -1,9 +1,11 @@
 // In-app notifications and optional email delivery. Email is enabled only when SMTP is configured.
 const db = require('./db');
 
-function notify({ userId = null, audience = 'customer', title, message, link = '/orders.html' }) {
-  db.prepare('INSERT INTO notifications (user_id, audience, title, message, link) VALUES (?, ?, ?, ?, ?)')
-    .run(userId, audience, title, message, link);
+async function notify({ userId = null, audience = 'customer', title, message, link = '/orders.html' }) {
+  await db.run(
+    'INSERT INTO notifications (user_id, audience, title, message, link, created_at) VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)',
+    [userId, audience, title, message, link]
+  );
 }
 
 async function emailUser(to, subject, text) {
@@ -23,8 +25,8 @@ async function emailUser(to, subject, text) {
   }
 }
 
-function customerEmail(userId) {
-  return db.prepare('SELECT name, email FROM users WHERE id = ?').get(userId);
+async function customerEmail(userId) {
+  return db.get('SELECT name, email FROM users WHERE id = ?', [userId]);
 }
 
 module.exports = { notify, emailUser, customerEmail };

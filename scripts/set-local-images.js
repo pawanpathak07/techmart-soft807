@@ -25,11 +25,15 @@ const dir = path.join(__dirname, '..', 'public', 'images', 'products');
 const files = fs.readdirSync(dir);
 const fileFor = (base) => files.find((f) => f.replace(/\.[^.]+$/, '').toLowerCase() === base);
 
-const update = db.prepare("UPDATE products SET image_url = ?, updated_at = datetime('now') WHERE name = ?");
-let changed = 0;
-for (const [name, base] of Object.entries(names)) {
-  const file = fileFor(base);
-  if (!file) { console.log('No picture file found for ' + name + ' (' + base + ')'); continue; }
-  changed += Number(update.run('/images/products/' + file, name).changes);
-}
-console.log('Updated pictures for ' + changed + ' product(s).');
+(async () => {
+  await db.init();
+  let changed = 0;
+  for (const [name, base] of Object.entries(names)) {
+    const file = fileFor(base);
+    if (!file) { console.log('No picture file found for ' + name + ' (' + base + ')'); continue; }
+    const r = await db.run('UPDATE products SET image_url = ?, updated_at = CURRENT_TIMESTAMP WHERE name = ?', ['/images/products/' + file, name]);
+    changed += Number(r.changes);
+  }
+  console.log('Updated pictures for ' + changed + ' product(s).');
+  process.exit(0);
+})().catch((e) => { console.error(e.message); process.exit(1); });

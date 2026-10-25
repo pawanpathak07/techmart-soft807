@@ -1,32 +1,41 @@
 # TechMart - Full-stack CRUD shop (customer site + admin panel)
 
-Node.js + Express backend, SQLite database, plain HTML/CSS/JavaScript frontend.
-No build step. Install, run, open the browser. The SQLite database remains the default runtime database.
+Node.js + Express backend, **MySQL database**, plain HTML/CSS/JavaScript frontend.
+No build step. Install, set your MySQL details, run, open the browser.
 
 ## 1. Requirements
 
-- Node.js **22.13 or newer** (24 is fine). Check with `node -v`. Get the LTS version at https://nodejs.org
-- Nothing else: no Python, no C++ tools, no database program. SQLite is built into Node.
+- Node.js **22.13 or newer** (`node -v`) from https://nodejs.org
+- **XAMPP** (Apache + MySQL + phpMyAdmin). Only MySQL needs to run.
 
-## 2. Setup (5 commands)
+## 2. Setup with XAMPP
 
-```bash
-cd shopapp
-npm install                 # installs every package listed below
-cp .env.example .env        # Windows: copy .env.example .env
-# open .env and set JWT_SECRET to any long random text
-npm start                   # or: npm run dev   (auto-restarts on changes)
-```
+1. Open **XAMPP Control Panel** and click **Start** next to **MySQL**.
+2. In the shopapp folder run:
+   ```bash
+   npm install
+   copy .env.example .env        # Mac/Linux: cp .env.example .env
+   npm run check:mysql           # must print "MySQL is connected"
+   npm start
+   ```
+   `.env` already uses the XAMPP defaults: `MYSQL_HOST=127.0.0.1`, `MYSQL_USER=root`, empty `MYSQL_PASSWORD`, `MYSQL_DATABASE=techmart`.
+   Set `JWT_SECRET` to any long random text.
+3. Open **http://localhost:3000** (shop) and **http://localhost:3000/admin/** (admin).
+4. Open **http://localhost/phpmyadmin** > database **techmart** to see the data live.
 
-Open **http://localhost:3000** (shop) and **http://localhost:3000/admin/** (admin panel).
+The `techmart` database and all tables are created automatically on first start.
+Alternative: in phpMyAdmin click **Import** and choose `database/techmart.sql` (creates the database, tables and demo data).
 
-The database file `data/shop.db` and all tables are created automatically on first start,
-and demo products and accounts are added when the database is empty.
+What is saved in MySQL: new customer sign-ups (`users`), product add / edit / delete by the admin (`products`),
+customer edit / delete (`users`), orders and stock (`orders`, `order_items`), reviews and notifications.
+
+If the port is busy or MySQL uses a password, change `MYSQL_PORT` / `MYSQL_PASSWORD` in `.env`.
+Azure MySQL: set `MYSQL_SSL=true`.
 
 | Role     | Email              | Password     |
 |----------|--------------------|--------------|
-| Admin    | admin@shop.local   | Admin@123    |
-| Customer | demo@shop.local    | Customer@123 |
+| Admin    | admin@gmail.com    | Admin@123    |
+| Customer | demo@gmail.com     | Customer@123 |
 
 Change or delete these accounts before putting the site online.
 
@@ -43,12 +52,10 @@ Installed by `npm install` (all already listed in `package.json`):
 | helmet | Adds secure HTTP headers (including a Content-Security-Policy) |
 | express-rate-limit | Slows down password guessing on login and register |
 | nodemailer | Optional SMTP email notifications |
-| mysql2 | MySQL client used by the one-time migration utility |
+| mysql2 | MySQL client: the app's database connection |
 | dotenv | Loads settings from the `.env` file |
 | nodemon (dev only) | Restarts the server when you edit code (`npm run dev`) |
 
-The database itself is Node's built-in `node:sqlite` module, so it is not in this list. You may see
-an "ExperimentalWarning: SQLite" message when the server starts. It is harmless.
 
 Windows tip: do not keep the folder inside OneDrive (Desktop or Documents are often synced).
 OneDrive can block `npm install` with EPERM errors. Move the folder to something like `C:\shopapp`.
@@ -154,5 +161,6 @@ shopapp/
 
 Set `NODE_ENV=production` and a strong `JWT_SECRET`, serve the site over HTTPS (the cookie
 becomes Secure in production), and change the demo passwords.
-#   t e c h m a r t - s o f t 8 0 7  
+#   t e c h m a r t - s o f t 8 0 7 
+ 
  

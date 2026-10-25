@@ -13,6 +13,7 @@
           password: document.getElementById('password').value,
         },
       });
+      await popup('Login successful! Welcome back, ' + user.name + '.', 'success', 1500);
       // Only follow same-site paths from ?next= (blocks open redirects)
       const next = new URLSearchParams(location.search).get('next');
       const safeNext = next && next.startsWith('/') && !next.startsWith('//') ? next : null;
@@ -20,6 +21,7 @@
       else location.href = safeNext && !safeNext.startsWith('/admin') ? safeNext : '/';
     } catch (err) {
       showAlert(alertBox, err.message);
+      popup(err.message, 'error');
     }
   });
 })();

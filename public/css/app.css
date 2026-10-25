@@ -59,9 +59,9 @@ h2 {
 }
 
 .container {
-  max-width: 1100px;
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 24px 20px 60px;
+  padding: 28px 32px 60px;
 }
 
 /* ---------- Navigation ---------- */
@@ -75,7 +75,7 @@ h2 {
 }
 
 .nav-inner {
-  max-width: 1100px;
+  max-width: 1400px;
   margin: 0 auto;
   padding: 0 20px;
   display: flex;
@@ -402,7 +402,7 @@ td.actions .btn {
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 18px;
 }
 
@@ -696,3 +696,31 @@ dialog .dlg-actions {
     height: 240px;
   }
 }
+
+/* ---------- Large desktop screens ---------- */
+@media (min-width: 1200px) {
+  body { font-size: 16px; }
+  .nav-inner { padding: 0 32px; }
+}
+@media (min-width: 1700px) {
+  .container, .nav-inner { max-width: 1600px; }
+}
+
+/* ---------- Pop-up messages ---------- */
+.popup-back {
+  position: fixed; inset: 0; background: rgba(16, 24, 40, .45);
+  display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px;
+}
+.popup {
+  background: var(--card); border-radius: 16px; padding: 28px 32px; max-width: 420px; width: 100%;
+  text-align: center; box-shadow: 0 20px 50px rgba(16, 24, 40, .3);
+}
+.popup-icon {
+  width: 56px; height: 56px; border-radius: 50%; margin: 0 auto 12px; font-size: 1.8rem; font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
+}
+.popup.success .popup-icon { background: var(--ok-soft); color: var(--ok); }
+.popup.error .popup-icon { background: var(--bad-soft); color: var(--bad); }
+.popup-text { margin: 0 0 16px; font-size: 1.05rem; font-weight: 600; }
+.popup.warn .popup-icon { background: var(--warn-soft); color: var(--warn); }
+.popup-actions { display: flex; gap: 10px; justify-content: center; }

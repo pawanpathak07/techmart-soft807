@@ -57,12 +57,12 @@
     if (t.dataset.edit) openForm(products.find((p) => p.id === Number(t.dataset.edit)));
     if (t.dataset.del) {
       const p = products.find((x) => x.id === Number(t.dataset.del));
-      if (!confirm(`Delete "${p.name}"? Past orders keep their record of it.`)) return;
+      if (!(await askConfirm(`Do you want to delete "${p.name}"? Past orders keep their record of it.`, 'Yes, delete', 'Cancel'))) return;
       try {
         await api('/products/' + p.id, { method: 'DELETE' });
-        toast('Product deleted');
-        load();
-      } catch (err) { toast(err.message, 'error'); }
+        await load();
+        popup(`Your product change was saved: "${p.name}" has been deleted from the database.`, 'success', 2500);
+      } catch (err) { popup(err.message, 'error'); }
     }
   });
 
@@ -74,8 +74,9 @@
       if (editingId) await api('/products/' + editingId, { method: 'PUT', body });
       else await api('/products', { method: 'POST', body });
       dlg.close();
-      toast(editingId ? 'Product updated' : 'Product added');
-      load();
+      const wasEdit = !!editingId;
+      await load();
+      popup(wasEdit ? `Your product change was saved: "${body.name}" has been updated in the database.` : `Your product change was saved: "${body.name}" has been added to the database.`, 'success', 2500);
     } catch (err) { showAlert(formAlert, err.message); }
   });
 

@@ -17,35 +17,36 @@ function roleOf(value) {
 }
 
 // READ (list)
-router.get('/', (_req, res) => {
-  res.json({ users: db.prepare(`SELECT ${COLUMNS} FROM users u ORDER BY u.id DESC`).all() });
+router.get('/', async (_req, res) => {
+  res.json({ users: await db.all(`SELECT ${COLUMNS} FROM users u ORDER BY u.id DESC`) });
 });
 
 // READ (one)
-router.get('/:id', (req, res) => {
-  const user = db.prepare(`SELECT ${COLUMNS} FROM users u WHERE u.id = ?`).get(v.id(req.params.id));
+router.get('/:id', async (req, res) => {
+  const user = await db.get(`SELECT ${COLUMNS} FROM users u WHERE u.id = ?`, [v.id(req.params.id)]);
   if (!user) throw new v.HttpError(404, 'User not found');
   res.json({ user });
 });
 
 // CREATE
-router.post('/', (req, res) => {
+router.post('/', async (req, res) => {
   const name = v.str(req.body.name, { field: 'Name', required: true, min: 2, max: 80 });
   const email = v.email(req.body.email);
   const password = v.password(req.body.password);
   const role = roleOf(req.body.role || 'customer');
-  if (db.prepare('SELECT id FROM users WHERE email = ?').get(email))
+  if (await db.get('SELECT id FROM users WHERE email = ?', [email]))
     throw new v.HttpError(409, 'An account with this email already exists');
-  const info = db
-    .prepare('INSERT INTO users (name, email, password_hash, role, active) VALUES (?, ?, ?, ?, ?)')
-    .run(name, email, bcrypt.hashSync(password, 10), role, req.body.active === false ? 0 : 1);
-  res.status(201).json({ user: db.prepare(`SELECT ${COLUMNS} FROM users u WHERE u.id = ?`).get(info.lastInsertRowid) });
+  const info = await db.run(
+    'INSERT INTO users (name, email, password_hash, role, active, created_at) VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)',
+    [name, email, bcrypt.hashSync(password, 10), role, req.body.active === false ? 0 : 1]
+  );
+  res.status(201).json({ user: await db.get(`SELECT ${COLUMNS} FROM users u WHERE u.id = ?`, [info.lastInsertRowid]) });
 });
 
 // UPDATE (password is optional: leave it blank to keep the current one)
-router.put('/:id', (req, res) => {
+router.put('/:id', async (req, res) => {
   const id = v.id(req.params.id);
-  const existing = db.prepare('SELECT * FROM users WHERE id = ?').get(id);
+  const existing = await db.get('SELECT * FROM users WHERE id = ?', [id]);
   if (!existing) throw new v.HttpError(404, 'User not found');
 
   const name = v.str(req.body.name, { field: 'Name', required: true, min: 2, max: 80 });
@@ -53,27 +54,23 @@ router.put('/:id', (req, res) => {
   const role = roleOf(req.body.role);
   const active = req.body.active ? 1 : 0;
 
-  const clash = db.prepare('SELECT id FROM users WHERE email = ? AND id <> ?').get(email, id);
+  const clash = await db.get('SELECT id FROM users WHERE email = ? AND id <> ?', [email, id]);
   if (clash) throw new v.HttpError(409, 'Another account already uses this email');
   if (id === req.user.id && (role !== 'admin' || !active))
     throw new v.HttpError(400, 'You cannot remove your own admin access or deactivate yourself');
 
-  db.prepare('UPDATE users SET name = ?, email = ?, role = ?, active = ? WHERE id = ?').run(
-    name, email, role, active, id
-  );
+  await db.run('UPDATE users SET name = ?, email = ?, role = ?, active = ? WHERE id = ?', [name, email, role, active, id]);
   if (req.body.password) {
-    db.prepare('UPDATE users SET password_hash = ? WHERE id = ?').run(
-      bcrypt.hashSync(v.password(req.body.password), 10), id
-    );
+    await db.run('UPDATE users SET password_hash = ? WHERE id = ?', [bcrypt.hashSync(v.password(req.body.password), 10), id]);
   }
-  res.json({ user: db.prepare(`SELECT ${COLUMNS} FROM users u WHERE u.id = ?`).get(id) });
+  res.json({ user: await db.get(`SELECT ${COLUMNS} FROM users u WHERE u.id = ?`, [id]) });
 });
 
 // DELETE (their past orders stay in the system with no linked customer)
-router.delete('/:id', (req, res) => {
+router.delete('/:id', async (req, res) => {
   const id = v.id(req.params.id);
   if (id === req.user.id) throw new v.HttpError(400, 'You cannot delete your own account');
-  const info = db.prepare('DELETE FROM users WHERE id = ?').run(id);
+  const info = await db.run('DELETE FROM users WHERE id = ?', [id]);
   if (info.changes === 0) throw new v.HttpError(404, 'User not found');
   res.json({ ok: true });
 });

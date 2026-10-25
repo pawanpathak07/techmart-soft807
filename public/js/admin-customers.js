@@ -64,10 +64,10 @@
     if (t.dataset.edit) openForm(users.find((u) => u.id === Number(t.dataset.edit)));
     if (t.dataset.del) {
       const u = users.find((x) => x.id === Number(t.dataset.del));
-      if (!confirm(`Delete ${u.name}? Their past orders stay in the system.`)) return;
+      if (!(await askConfirm(`Do you want to delete ${u.name}? Their past orders stay in the system.`, 'Yes, delete', 'Cancel'))) return;
       try {
         await api('/users/' + u.id, { method: 'DELETE' });
-        toast('User deleted');
+        popup('User deleted from the database.', 'success', 2000);
         load();
       } catch (err) { toast(err.message, 'error'); }
     }
@@ -87,7 +87,7 @@
       if (editingId) await api('/users/' + editingId, { method: 'PUT', body });
       else await api('/users', { method: 'POST', body });
       dlg.close();
-      toast(editingId ? 'User updated' : 'User added');
+      popup(editingId ? 'User change saved: user updated in the database.' : 'User change saved: user added to the database.', 'success', 2000);
       load();
     } catch (err) { showAlert(formAlert, err.message); }
   });

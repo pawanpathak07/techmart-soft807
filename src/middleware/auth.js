@@ -28,15 +28,13 @@ function clearToken(res) {
   });
 }
 
-function loadUser(req, _res, next) {
+async function loadUser(req, _res, next) {
   req.user = null;
   const token = req.cookies && req.cookies[COOKIE];
   if (token) {
     try {
       const { id } = jwt.verify(token, secret());
-      const user = db
-        .prepare('SELECT id, name, email, role, active FROM users WHERE id = ?')
-        .get(id);
+      const user = await db.get('SELECT id, name, email, role, active FROM users WHERE id = ?', [id]);
       if (user && user.active) req.user = user;
     } catch (_) {
       /* invalid or expired token: treat as logged out */

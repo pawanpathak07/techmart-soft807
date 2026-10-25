@@ -40,6 +40,41 @@ function toast(message, type) {
   setTimeout(() => t.remove(), 3500);
 }
 
+// Big centred pop-up message (used for sign up / login). Resolves when it closes.
+function popup(message, type = 'success', ms = 1800) {
+  return new Promise((resolve) => {
+    const back = document.createElement('div');
+    back.className = 'popup-back';
+    back.innerHTML = '<div class="popup ' + type + '" role="alertdialog"><div class="popup-icon">' +
+      (type === 'success' ? '&#10003;' : '!') + '</div><p class="popup-text"></p><button type="button" class="btn">OK</button></div>';
+    back.querySelector('.popup-text').textContent = message;
+    document.body.appendChild(back);
+    let done = false;
+    const close = () => { if (done) return; done = true; back.remove(); resolve(); };
+    back.querySelector('button').addEventListener('click', close);
+    back.addEventListener('click', (e) => { if (e.target === back) close(); });
+    if (type === 'success') setTimeout(close, ms);
+  });
+}
+
+// Yes / No pop-up. Resolves true when the person clicks the confirm button.
+function askConfirm(message, yesText = 'Yes', noText = 'Cancel') {
+  return new Promise((resolve) => {
+    const back = document.createElement('div');
+    back.className = 'popup-back';
+    back.innerHTML = '<div class="popup warn" role="alertdialog"><div class="popup-icon">?</div><p class="popup-text"></p>' +
+      '<div class="popup-actions"><button type="button" class="btn" data-no></button><button type="button" class="btn primary" data-yes></button></div></div>';
+    back.querySelector('.popup-text').textContent = message;
+    back.querySelector('[data-yes]').textContent = yesText;
+    back.querySelector('[data-no]').textContent = noText;
+    document.body.appendChild(back);
+    const end = (v) => { back.remove(); resolve(v); };
+    back.querySelector('[data-yes]').addEventListener('click', () => end(true));
+    back.querySelector('[data-no]').addEventListener('click', () => end(false));
+    back.addEventListener('click', (e) => { if (e.target === back) end(false); });
+  });
+}
+
 function showAlert(el, message, type = 'error') {
   el.textContent = message;
   el.className = 'alert show ' + type;
@@ -120,7 +155,9 @@ function renderNav(user, active) {
   const out = document.getElementById('logoutBtn');
   if (out) {
     out.addEventListener('click', async () => {
+      if (!(await askConfirm('Do you want to log out?', 'Yes, log out', 'Stay logged in'))) return;
       await api('/auth/logout', { method: 'POST' });
+      await popup('You have been logged out successfully.', 'success', 1200);
       location.href = '/login.html';
     });
   }

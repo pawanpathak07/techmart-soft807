@@ -16,7 +16,26 @@ const express = require('express');
 const helmet = require('helmet');
 const cookieParser = require('cookie-parser');
 
-require('./src/seed'); // creates tables (via db.js) and inserts demo data when empty
+// Express 4 does not catch errors thrown inside async route handlers.
+// This small patch sends them to the error handler below (so the browser gets JSON, not a hang).
+const Layer = require('express/lib/router/layer');
+Object.defineProperty(Layer.prototype, 'handle', {
+  configurable: true,
+  get() { return this._handle; },
+  set(fn) {
+    // only wrap normal handlers (3 args); error handlers (4 args) are left alone
+    this._handle = fn.length > 3 ? fn : function (req, res, next) {
+      try {
+        const ret = fn.call(this, req, res, next);
+        if (ret && typeof ret.catch === 'function') ret.catch(next);
+        return ret;
+      } catch (e) { return next(e); }
+    };
+  },
+});
+
+const db = require('./src/db');
+const { setup } = require('./src/seed'); // creates tables and inserts demo data when empty
 const { loadUser } = require('./src/middleware/auth');
 
 const app = express();
@@ -31,6 +50,13 @@ app.use(
     },
   })
 );
+
+// Wait until the database is ready (MySQL tables created) before answering any request.
+let ready = null;
+app.use((_req, _res, next) => {
+  if (!ready) ready = setup();
+  ready.then(() => next(), next);
+});
 
 app.use(express.json({ limit: '100kb' }));
 app.use(cookieParser());
@@ -68,9 +94,16 @@ app.use((err, _req, res, _next) => {
 
 if (require.main === module) {
   const PORT = process.env.PORT || 3000;
-  app.listen(PORT, () => {
-    console.log(`Shop running at http://localhost:${PORT}`);
-    console.log(`Admin panel:     http://localhost:${PORT}/admin/`);
+  ready = setup();
+  ready.then(() => {
+    app.listen(PORT, () => {
+      console.log(`Shop running at http://localhost:${PORT}`);
+      console.log(`Admin panel:     http://localhost:${PORT}/admin/`);
+    });
+  }).catch((err) => {
+    console.error('\n[db] Could not start the database: ' + err.message);
+    console.error('     Check the MYSQL_* settings in your .env file, then run: npm run check:mysql\n');
+    process.exit(1);
   });
 }
 

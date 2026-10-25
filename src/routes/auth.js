@@ -19,28 +19,29 @@ const loginLimiter = rateLimit({
 const publicUser = (u) => ({ id: u.id, name: u.name, email: u.email, role: u.role });
 
 // Create a customer account (role is always "customer" here)
-router.post('/register', loginLimiter, (req, res) => {
+router.post('/register', loginLimiter, async (req, res) => {
   const name = v.str(req.body.name, { field: 'Name', required: true, min: 2, max: 80 });
   const email = v.email(req.body.email);
   const password = v.password(req.body.password);
 
-  if (db.prepare('SELECT id FROM users WHERE email = ?').get(email))
+  if (await db.get('SELECT id FROM users WHERE email = ?', [email]))
     throw new v.HttpError(409, 'This Gmail ID is already signed up. Please try another Gmail ID or log in.');
 
   const hash = bcrypt.hashSync(password, 10);
-  const info = db
-    .prepare('INSERT INTO users (name, email, password_hash, role) VALUES (?, ?, ?, ?)')
-    .run(name, email, hash, 'customer');
-  const user = db.prepare('SELECT * FROM users WHERE id = ?').get(info.lastInsertRowid);
+  const info = await db.run(
+    'INSERT INTO users (name, email, password_hash, role, active, created_at) VALUES (?, ?, ?, ?, 1, CURRENT_TIMESTAMP)',
+    [name, email, hash, 'customer']
+  );
+  const user = await db.get('SELECT * FROM users WHERE id = ?', [info.lastInsertRowid]);
   issueToken(res, user);
   emailUser(user.email, 'Welcome to TechMart', `Hi ${user.name},\n\nYour TechMart account has been created successfully.\nSign-up email: ${user.email}\n\nWhen you place an order, we will email you the order items, total, and each order status update (pending, paid, shipped, delivered, or cancelled).\n\nThank you for joining TechMart.`);
   res.status(201).json({ user: publicUser(user) });
 });
 
-router.post('/login', loginLimiter, (req, res) => {
+router.post('/login', loginLimiter, async (req, res) => {
   const email = v.str(req.body.email, { field: 'Email', required: true }).toLowerCase();
   const password = typeof req.body.password === 'string' ? req.body.password : '';
-  const user = db.prepare('SELECT * FROM users WHERE email = ?').get(email);
+  const user = await db.get('SELECT * FROM users WHERE email = ?', [email]);
 
   // Same message for unknown email and wrong password so accounts cannot be guessed
   if (!user || !bcrypt.compareSync(password, user.password_hash))
@@ -62,18 +63,18 @@ router.get('/me', (req, res) => {
 });
 
 // Customer edits own profile. Changing the password needs the current one.
-router.put('/me', requireAuth, (req, res) => {
+router.put('/me', requireAuth, async (req, res) => {
   const name = v.str(req.body.name, { field: 'Name', required: true, min: 2, max: 80 });
-  db.prepare('UPDATE users SET name = ? WHERE id = ?').run(name, req.user.id);
+  await db.run('UPDATE users SET name = ? WHERE id = ?', [name, req.user.id]);
 
   if (req.body.newPassword) {
-    const row = db.prepare('SELECT password_hash FROM users WHERE id = ?').get(req.user.id);
+    const row = await db.get('SELECT password_hash FROM users WHERE id = ?', [req.user.id]);
     if (!bcrypt.compareSync(String(req.body.currentPassword || ''), row.password_hash))
       throw new v.HttpError(400, 'Current password is incorrect');
     const hash = bcrypt.hashSync(v.password(req.body.newPassword), 10);
-    db.prepare('UPDATE users SET password_hash = ? WHERE id = ?').run(hash, req.user.id);
+    await db.run('UPDATE users SET password_hash = ? WHERE id = ?', [hash, req.user.id]);
   }
-  const user = db.prepare('SELECT * FROM users WHERE id = ?').get(req.user.id);
+  const user = await db.get('SELECT * FROM users WHERE id = ?', [req.user.id]);
   res.json({ user: publicUser(user) });
 });
 

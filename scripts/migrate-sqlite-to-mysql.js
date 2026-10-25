@@ -20,7 +20,7 @@ database: process.env.MYSQL_DATABASE,
 waitForConnections: true,
 connectionLimit: 2,
 charset: 'utf8mb4',
-ssl: { rejectUnauthorized: false },
+// ssl: { rejectUnauthorized: false },
 
   });
   const connection = await pool.getConnection();
