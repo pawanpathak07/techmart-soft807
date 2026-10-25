@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Admin - Database Management</title>
+    <link rel="stylesheet" href="/css/app.css">
+</head>
+
+<body>
+    <main class="container">
+        <div class="page-head">
+            <div>
+                <h1>Database management</h1>
+                <p class="muted" style="margin:0">Read-only database health and export tools.</p>
+            </div><button class="btn primary" id="exportBtn">Export data backup (JSON)</button>
+        </div>
+        <div class="card">
+            <h2>Connection</h2>
+            <p id="engine">Loading database information…</p>
+            <!-- <p class="muted small">This page does not modify or delete database records. Keep downloaded backups in a -->
+                secure location.</p>
+        </div>
+        <h2 style="margin-top:22px">Record counts</h2>
+        <div class="stats" id="counts"></div>
+        <div class="card">
+            <!-- <h2>Migration to MySQL</h2> -->
+            <!-- <p>Use the included <code>scripts/migrate-sqlite-to-mysql.js</code> utility to copy records into an empty
+                MySQL database. It leaves the SQLite source unchanged and stops if target tables contain rows. The
+                current application still runs on SQLite; switching the live app to MySQL requires a separate
+                adapter/configuration change.</p> -->
+            <!-- <p>Before migrating, stop writes, make a backup, set the MySQL connection variables in <code>.env</code>,
+                run <code>npm run migrate:mysql</code>, compare row counts, and test on a staging copy.</p> -->
+        </div>
+    </main>
+    <script src="/js/common.js"></script>
+    <script src="/js/admin-database.js"></script>
+</body>
+
+</html>

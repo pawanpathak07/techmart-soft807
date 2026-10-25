@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Admin - Dashboard</title>
+  <link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+  <main class="container">
+    <div class="page-head"><div><h1>Dashboard</h1><p class="muted" style="margin:0">A quick look at how the shop is doing.</p></div></div>
+
+    <div class="stats" id="stats"></div>
+
+    <div class="two">
+      <section class="card">
+        <h2>Recent orders</h2>
+        <div class="table-wrap" id="recent"></div>
+      </section>
+      <section class="card">
+        <h2>Low stock (5 or fewer)</h2>
+        <div class="table-wrap" id="low"></div>
+      </section>
+    </div>
+    <section class="card" style="margin-top:18px">
+      <h2>Orders by status</h2>
+      <div id="byStatus"></div>
+    </section>
+  </main>
+  <script src="/js/common.js"></script>
+  <script src="/js/admin-dashboard.js"></script>
+</body>
+</html>

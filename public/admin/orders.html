@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Admin - Orders</title>
+  <link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+  <main class="container">
+    <div class="page-head"><div><h1>Orders</h1><p class="muted" style="margin:0">Review orders and move them through fulfilment.</p></div></div>
+    <div class="toolbar">
+      <select id="filter">
+        <option value="">All statuses</option>
+        <option>pending</option><option>paid</option><option>shipped</option><option>delivered</option><option>cancelled</option>
+      </select>
+    </div>
+    <div class="card table-wrap" id="table"></div>
+  </main>
+
+  <dialog id="dlg"><div class="dlg" id="dlgBody"></div></dialog>
+
+  <script src="/js/common.js"></script>
+  <script src="/js/admin-orders.js"></script>
+</body>
+</html>
